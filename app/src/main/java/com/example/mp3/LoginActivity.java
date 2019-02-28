@@ -54,9 +54,6 @@ public class LoginActivity extends AppCompatActivity {
                     Social newSocial = new Social(event_name, email, desc, date, uid, numInterested);
                     socials.add(newSocial);
                 }
-                if (!socials.isEmpty()) {
-                    Log.d("FETCH RESULTS:", socials.get(0).getEventName());
-                }
             }
 
             @Override
