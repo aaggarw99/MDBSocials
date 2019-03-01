@@ -73,6 +73,10 @@ public class NewSocialActivity extends AppCompatActivity {
         dateField = findViewById(R.id.date);
         descriptionField = findViewById(R.id.desc);
         uploadImage = findViewById(R.id.uploadimg);
+        // set default uploadImage
+        int resID = getResources().getIdentifier("round_add_photo_alternate_24", "drawable",  getPackageName());
+        uploadImage.setImageResource(resID);
+
         submit = findViewById(R.id.submit);
 
         // upload image handler
@@ -98,10 +102,10 @@ public class NewSocialActivity extends AppCompatActivity {
                     final String desc = descriptionField.getText().toString().trim();
 
 
-                    FirebaseUser currUser = FirebaseAuth.getInstance().getCurrentUser();
+                    final FirebaseUser currUser = FirebaseAuth.getInstance().getCurrentUser();
                     final String poster = currUser.getEmail();
                     final String uid = currUser.getUid();
-                    final String interested = "0";
+                    final String interested = "1";
 
                     // do a check for empty fields
                     if (TextUtils.isEmpty(event_name) || TextUtils.isEmpty(strDate) || TextUtils.isEmpty(desc)) {
@@ -122,6 +126,8 @@ public class NewSocialActivity extends AppCompatActivity {
                             databaseRef.child("socials").child(key).child("Date").setValue(strDate);
                             databaseRef.child("socials").child(key).child("Description").setValue(desc);
                             databaseRef.child("socials").child(key).child("numInterested").setValue(interested);
+                            // by default, each event starts with 1 interested
+                            databaseRef.child("socials").child(key).child("peopleInterested").child(currUser.getUid()).setValue(true);
                             startActivity(new Intent(NewSocialActivity.this, LoginActivity.class));
                         }
                     });

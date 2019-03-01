@@ -56,7 +56,17 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser != null) {
+            startActivity(new Intent(MainActivity.this, LoginActivity.class));
+        }
+    }
 
+
+    /* Logging in functionality */
     public void loginUser(String email, String password) {
         if (email == null || password == null) {
             Toast.makeText(this, "Please enter your email and password", Toast.LENGTH_LONG).show();

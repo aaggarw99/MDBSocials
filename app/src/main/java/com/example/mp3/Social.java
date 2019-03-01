@@ -33,4 +33,6 @@ public class Social {
 
     public String getId() { return id; }
 
+    public String getDate() { return date; }
+
 }

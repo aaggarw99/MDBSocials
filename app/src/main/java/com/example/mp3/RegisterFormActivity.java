@@ -50,7 +50,7 @@ public class RegisterFormActivity extends AppCompatActivity {
         });
 
     }
-
+    /* Registering a user */
     public void registerUser(String email, String password, String first, String last) {
         if (email == null || password == null) {
             Toast.makeText(this, "Please enter your email and password", Toast.LENGTH_LONG).show();
