@@ -41,14 +41,14 @@
 
     <TextView
         android:id="@+id/poster"
-        android:layout_width="334dp"
+        android:layout_width="384dp"
         android:layout_height="29dp"
         android:layout_marginStart="38dp"
         android:layout_marginTop="6dp"
         android:layout_marginEnd="39dp"
         android:fontFamily="sans-serif"
         android:text="aaggarw@berkeley.edu's event"
-        android:textAlignment="viewStart"
+        android:textAlignment="center"
         android:textColor="@color/common_google_signin_btn_text_dark_focused"
         android:textSize="18sp"
         android:textStyle="bold"

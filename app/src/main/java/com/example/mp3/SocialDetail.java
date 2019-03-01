@@ -73,7 +73,9 @@ public class SocialDetail extends AppCompatActivity {
 
                 // fetch data
                 eventNameField.setText(dataSnapshot.child("eventName").getValue(String.class));
-                posterField.setText(dataSnapshot.child("userEmail").getValue(String.class));
+
+                String userEmailSentence = "created by " + dataSnapshot.child("userEmail").getValue(String.class);
+                posterField.setText(userEmailSentence);
                 dateField.setText(dataSnapshot.child("Date").getValue(String.class));
                 descField.setText(dataSnapshot.child("Description").getValue(String.class));
 
