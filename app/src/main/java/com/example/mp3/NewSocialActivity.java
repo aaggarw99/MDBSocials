@@ -41,16 +41,13 @@ public class NewSocialActivity extends AppCompatActivity {
     private Uri uri = null;
 
     // Firebase shit
-    private FirebaseDatabase database;
     private DatabaseReference databaseRef;
 
     StorageReference sref, imgref;
 
     private FirebaseAuth mAuth;
-    private DatabaseReference mDatabaseUsers;
     private FirebaseUser mCurrentUser;
 
-    // gs://mdbsocials-8e5ef.appspot.com/
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,13 +59,15 @@ public class NewSocialActivity extends AppCompatActivity {
         databaseRef = FirebaseDatabase.getInstance().getReference();
         mAuth = FirebaseAuth.getInstance();
         mCurrentUser = mAuth.getCurrentUser();
+        // creates new object in socials and gets the key for it
         final String key = databaseRef.child("socials").push().getKey();
 
+        //  storage url for images
         sref = FirebaseStorage.getInstance().getReferenceFromUrl("gs://mdbsocials-8e5ef.appspot.com/");
+        // imgref is one root down from storage
         imgref = sref.child(key + ".png");
 
         // connecting xml items
-
         eventNameField = findViewById(R.id.ename);
         dateField = findViewById(R.id.date);
         descriptionField = findViewById(R.id.desc);
@@ -83,8 +82,10 @@ public class NewSocialActivity extends AppCompatActivity {
         uploadImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                // creates new intent for getting images from gallery
                 Intent galleryIntent = new Intent(Intent.ACTION_GET_CONTENT);
                 galleryIntent.setType("image/*");
+                // we use the Result callback to use this data (see below)
                 startActivityForResult(galleryIntent, 2);
             }
         });
@@ -101,10 +102,9 @@ public class NewSocialActivity extends AppCompatActivity {
                     final String strDate = dateField.getText().toString();
                     final String desc = descriptionField.getText().toString().trim();
 
-
+                    // get user information
                     final FirebaseUser currUser = FirebaseAuth.getInstance().getCurrentUser();
                     final String poster = currUser.getEmail();
-                    final String uid = currUser.getUid();
                     final String interested = "1";
 
                     // do a check for empty fields
@@ -113,6 +113,7 @@ public class NewSocialActivity extends AppCompatActivity {
                         return;
                     }
 
+                    // puts the image into the imgref storage database
                     imgref.putFile(uri).addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
@@ -125,8 +126,8 @@ public class NewSocialActivity extends AppCompatActivity {
                             databaseRef.child("socials").child(key).child("eventName").setValue(event_name);
                             databaseRef.child("socials").child(key).child("Date").setValue(strDate);
                             databaseRef.child("socials").child(key).child("Description").setValue(desc);
-                            databaseRef.child("socials").child(key).child("numInterested").setValue(interested);
                             // by default, each event starts with 1 interested
+                            databaseRef.child("socials").child(key).child("numInterested").setValue(interested);
                             databaseRef.child("socials").child(key).child("peopleInterested").child(currUser.getUid()).setValue(true);
                             startActivity(new Intent(NewSocialActivity.this, LoginActivity.class));
                         }
@@ -142,42 +143,9 @@ public class NewSocialActivity extends AppCompatActivity {
         //image from gallery result
         if (requestCode == 2 && resultCode == RESULT_OK){
             uri = data.getData();
+            // sets the imageview to this image
             uploadImage.setImageURI(uri);
 
         }
     }
 }
-
-//filepath.putFile(uri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-//@Override
-//public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-//@SuppressWarnings("VisibleForTests")
-////getting the post image download url
-//final Uri downloadUrl = taskSnapshot.getMetadata().getReference().getDownloadUrl();
-//        Toast.makeText(getApplicationContext(), "Successfully Uploaded", Toast.LENGTH_SHORT).show();
-//final DatabaseReference newSocial = databaseRef.push();
-//
-//        mDatabaseUsers.addValueEventListener(new ValueEventListener() {
-//@Override
-//public void onDataChange(DataSnapshot dataSnapshot) {
-//        newSocial.child("event_name").setValue(event_name);
-//        newSocial.child("description").setValue(desc);
-//        newSocial.child("imageUrl").setValue(downloadUrl.toString());
-//        newSocial.child("uid").setValue(uid);
-//        newSocial.child("poster").setValue(poster);
-//
-//
-//        newPost.child(“username”).setValue(dataSnapshot.child(“name”).getValue())
-//        .addOnCompleteListener(new OnCompleteListener<Void>() {
-//@Override
-//public void onComplete(@NonNull Task<Void> task) {
-//        if (task.isSuccessful()) {
-//        Intent intent = new Intent(NewSocialActivity.this, LoginActivity.class);
-//        startActivity(intent);
-//        }
-//        }
-//        });
-//        }
-//        });
-//        }
-//        });
