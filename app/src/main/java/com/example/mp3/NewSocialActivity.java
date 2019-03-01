@@ -118,7 +118,6 @@ public class NewSocialActivity extends AppCompatActivity {
                         @Override
                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                             databaseRef.child("socials").child(key).child("userEmail").setValue(poster);
-                            databaseRef.child("socials").child(key).child("uid").setValue(uid);
                             databaseRef.child("socials").child(key).child("eventName").setValue(event_name);
                             databaseRef.child("socials").child(key).child("Date").setValue(strDate);
                             databaseRef.child("socials").child(key).child("Description").setValue(desc);
@@ -138,6 +137,7 @@ public class NewSocialActivity extends AppCompatActivity {
         if (requestCode == 2 && resultCode == RESULT_OK){
             uri = data.getData();
             uploadImage.setImageURI(uri);
+
         }
     }
 }

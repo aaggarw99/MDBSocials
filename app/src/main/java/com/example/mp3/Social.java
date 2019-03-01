@@ -1,5 +1,7 @@
 package com.example.mp3;
 
+import android.net.Uri;
+
 public class Social {
 
     public String event_name;
@@ -17,12 +19,18 @@ public class Social {
         this.poster = email;
         this.desc = description;
         this.date = date;
-        this.id = id;
+        this.id = id; // this is the id for the key, "key.png"
         this.interested = interest;
     }
 
     public String getEventName() {
         return event_name;
     }
+
+    public String getPoster() { return poster; }
+
+    public String getInterested() { return interested; }
+
+    public String getId() { return id; }
 
 }
