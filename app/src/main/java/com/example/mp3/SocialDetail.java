@@ -25,7 +25,7 @@ import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 
-public class SocialDetail extends AppCompatActivity {
+public class SocialDetail extends AppCompatActivity implements View.OnClickListener {
 
     TextView eventNameField;
     TextView dateField;
@@ -56,6 +56,9 @@ public class SocialDetail extends AppCompatActivity {
         back = findViewById(R.id.back);
         numberInterested = 1;
 
+        back.setOnClickListener(this);
+        interestCheckBox.setOnClickListener(this);
+
         final FirebaseUser currUser = FirebaseAuth.getInstance().getCurrentUser();
 
 
@@ -70,17 +73,20 @@ public class SocialDetail extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
+                Social s = FirebaseUtils.getSocialFromFirebase(dataSnapshot);
 
                 // fetch data
-                eventNameField.setText(dataSnapshot.child("eventName").getValue(String.class));
+                eventNameField.setText(s.getEventName());
 
-                String userEmailSentence = "created by " + dataSnapshot.child("userEmail").getValue(String.class);
+                String userEmailSentence = "created by " + s.getPoster();
                 posterField.setText(userEmailSentence);
-                dateField.setText(dataSnapshot.child("Date").getValue(String.class));
-                descField.setText(dataSnapshot.child("Description").getValue(String.class));
+
+                dateField.setText(s.getDate());
+                descField.setText(s.getDesc());
 
                 // fetches the number of interested people string from database
-                String numberInterestedString = dataSnapshot.child("numInterested").getValue(String.class);
+                String numberInterestedString = s.getInterested();
+
                 // converts to integer
                 numberInterested = Integer.parseInt(numberInterestedString);
                 // combines string with words to form a sentence
@@ -88,8 +94,7 @@ public class SocialDetail extends AppCompatActivity {
                 numInterestedField.setText(interestedSentence);
 
                 //image shit
-                StorageReference sRef = FirebaseStorage.getInstance().getReference().child(i.getStringExtra("id") + ".png");
-                Glide.with(context).using(new FirebaseImageLoader()).load(sRef).into(imgView);
+                Glide.with(context).using(new FirebaseImageLoader()).load(FirebaseUtils.getImageStorageRef(i.getStringExtra("id"))).into(imgView);
 
                 // gets all the uids that are interested in this event
                 uids = new ArrayList<>();
@@ -113,9 +118,17 @@ public class SocialDetail extends AppCompatActivity {
             }
         });
 
-        interestCheckBox.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch(v.getId()) {
+            case (R.id.interestCheckBox):
+                final FirebaseUser currUser = FirebaseAuth.getInstance().getCurrentUser();
+                final Intent i = getIntent();
+                final DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference("/socials/"+i.getStringExtra("id"));
+
                 if (!interestCheckBox.isChecked()) {
                     numberInterested -= 1;
                     uids.remove(currUser.getUid());
@@ -139,20 +152,11 @@ public class SocialDetail extends AppCompatActivity {
                 for (String uid : uids) {
                     databaseRef.child("peopleInterested").child(uid).setValue(true);
                 }
+                break;
 
-
-            }
-        });
-
-        back.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                goToLoginActivity();
-            }
-        });
-    }
-
-    public void goToLoginActivity() {
-        startActivity(new Intent(this, LoginActivity.class));
+            case (R.id.back):
+                startActivity(new Intent(this, LoginActivity.class));
+                break;
+        }
     }
 }

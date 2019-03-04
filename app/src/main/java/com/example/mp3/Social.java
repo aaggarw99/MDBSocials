@@ -35,4 +35,6 @@ public class Social {
 
     public String getDate() { return date; }
 
+    public String getDesc() { return desc; }
+
 }

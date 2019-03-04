@@ -19,7 +19,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     private FirebaseAuth mAuth;
 
@@ -40,19 +40,8 @@ public class MainActivity extends AppCompatActivity {
         login = findViewById(R.id.login);
         register = findViewById(R.id.register);
 
-        login.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                loginUser(email.getText().toString(), password.getText().toString());
-            }
-        });
-
-        register.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                goToRegister();
-            }
-        });
+        login.setOnClickListener(this);
+        register.setOnClickListener(this);
 
     }
 
@@ -65,43 +54,20 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
-    /* Logging in functionality */
-    public void loginUser(String email, String password) {
-        if (email == null || password == null) {
-            Toast.makeText(this, "Please enter your email and password", Toast.LENGTH_LONG).show();
-        } else if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password)) {
-            Toast.makeText(this, "Please make sure your email and password are not empty", Toast.LENGTH_LONG).show();
-        } else {
-            mAuth.signInWithEmailAndPassword(email, password)
-                    .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                        @Override
-                        public void onComplete(@NonNull Task<AuthResult> task) {
-                            if (task.isSuccessful()) {
-                                // Sign in success, update UI with the signed-in user's information
-                                Log.d("SUCCESS", "signInWithEmailAndPassword:success");
-                                FirebaseUser user = mAuth.getCurrentUser();
-                                goToFeed();
-                            } else {
-                                // If sign in fails, display a message to the user.
-                                Log.w("FAILURE", "signInWithEmailAndPassword:failure", task.getException());
-                                Toast.makeText(MainActivity.this, "Authentication failed.",
-                                        Toast.LENGTH_SHORT).show();
-                            }
-
-                            // ...
-                        }
-                    });
-        }
-    }
-
-    public void goToFeed() {
-        Intent i = new Intent(this, LoginActivity.class);
-        startActivity(i);
-    }
-
-    public void goToRegister() {
+    private void goToRegister() {
         Intent i = new Intent(this, RegisterFormActivity.class);
         startActivity(i);
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case (R.id.login):
+                FirebaseUtils.loginUser(email.getText().toString(), password.getText().toString(), mAuth, this);
+                break;
+            case (R.id.register):
+                goToRegister();
+                break;
+        }
     }
 }

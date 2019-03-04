@@ -28,7 +28,7 @@ import java.util.Collection;
 import java.util.Collections;
 
 
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
 
     ArrayList<Social> socials;
 
@@ -66,19 +66,11 @@ public class LoginActivity extends AppCompatActivity {
                 // This method is called once with the initial value and again
                 // whenever data at this location is updated.
 
-                Long timestamp = (Long) dataSnapshot.getValue();
                 socials.clear();
 
                 // fetching new snapshot and convert it to a social object
                 for (DataSnapshot dataSnapshot2: dataSnapshot.getChildren()) {
-                    String email = dataSnapshot2.child("userEmail").getValue(String.class);
-                    String key = dataSnapshot2.getKey(); // key for image
-                    String event_name = dataSnapshot2.child("eventName").getValue(String.class);
-                    String date = dataSnapshot2.child("Date").getValue(String.class);
-                    String desc = dataSnapshot2.child("Description").getValue(String.class);
-                    String numInterested = dataSnapshot2.child("numInterested").getValue(String.class);
-                    Social newSocial = new Social(event_name, email, desc, date, key, numInterested);
-                    socials.add(0, newSocial);
+                    socials.add(0, FirebaseUtils.getSocialFromFirebase(dataSnapshot2));
                 }
                 // lets adapter know to reorganize recycler view
                 adapter.notifyDataSetChanged();
@@ -95,20 +87,28 @@ public class LoginActivity extends AppCompatActivity {
 
         // adding new event handling
         fabAdd = findViewById(R.id.fab);
-        fabAdd.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                goToNewSocialActivity();
-            }
-        });
+        fabAdd.setOnClickListener(this);
 
         // logging out handling
         fabLogout = findViewById(R.id.logout);
-        final Context context = this;
-        fabLogout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        fabLogout.setOnClickListener(this);
+    }
+
+
+    private void goToMainScreen() {
+        Intent i = new Intent(this, MainActivity.class);
+        startActivity(i);
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch(v.getId()) {
+            case (R.id.fab):
+                Intent i = new Intent(this, NewSocialActivity.class);
+                startActivity(i);
+                break;
+            case (R.id.logout):
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setMessage("Are you sure you want to logout?")
                         .setCancelable(false)
                         .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
@@ -124,19 +124,7 @@ public class LoginActivity extends AppCompatActivity {
                         });
                 AlertDialog alert = builder.create();
                 alert.show();
-            }
-        });
+        }
     }
-
-    public void goToNewSocialActivity() {
-        Intent i = new Intent(this, NewSocialActivity.class);
-        startActivity(i);
-    }
-
-    public void goToMainScreen() {
-        Intent i = new Intent(this, MainActivity.class);
-        startActivity(i);
-    }
-
 
 }

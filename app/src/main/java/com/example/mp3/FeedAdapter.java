@@ -52,8 +52,8 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         String strDate = "on " + s.getDate();
         ((Item) viewHolder).date.setText(strDate);
 
-        StorageReference sRef = FirebaseStorage.getInstance().getReference().child(socials.get(i).getId() + ".png");
-        Glide.with(context).using(new FirebaseImageLoader()).load(sRef).into(((Item) viewHolder).img);
+        //StorageReference sRef = FirebaseStorage.getInstance().getReference().child(socials.get(i).getId() + ".png");
+        Glide.with(context).using(new FirebaseImageLoader()).load(FirebaseUtils.getImageStorageRef(socials.get(i).getId())).into(((Item) viewHolder).img);
     }
 
     @Override

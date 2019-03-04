@@ -31,7 +31,7 @@ import org.w3c.dom.Text;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
-public class NewSocialActivity extends AppCompatActivity {
+public class NewSocialActivity extends AppCompatActivity implements View.OnClickListener{
 
     TextView eventNameField;
     TextView dateField;
@@ -47,7 +47,7 @@ public class NewSocialActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
     private FirebaseUser mCurrentUser;
-
+    String key;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +61,8 @@ public class NewSocialActivity extends AppCompatActivity {
         mCurrentUser = mAuth.getCurrentUser();
         // creates new object in socials and gets the key for it
         final String key = databaseRef.child("socials").push().getKey();
+        this.key = key;
+
 
         //  storage url for images
         sref = FirebaseStorage.getInstance().getReferenceFromUrl("gs://mdbsocials-8e5ef.appspot.com/");
@@ -77,22 +79,37 @@ public class NewSocialActivity extends AppCompatActivity {
         uploadImage.setImageResource(resID);
 
         submit = findViewById(R.id.submit);
+        submit.setOnClickListener(this);
 
-        // upload image handler
-        uploadImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        uploadImage.setOnClickListener(this);
+
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        //image from gallery result
+        if (requestCode == 2 && resultCode == RESULT_OK){
+            uri = data.getData();
+            // sets the imageview to this image
+            uploadImage.setImageURI(uri);
+
+        }
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch(v.getId()) {
+            case (R.id.uploadimg):
                 // creates new intent for getting images from gallery
                 Intent galleryIntent = new Intent(Intent.ACTION_GET_CONTENT);
                 galleryIntent.setType("image/*");
                 // we use the Result callback to use this data (see below)
                 startActivityForResult(galleryIntent, 2);
-            }
-        });
+                break;
 
-        submit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+            case (R.id.submit):
                 Toast.makeText(NewSocialActivity.this, "POSTING…", Toast.LENGTH_LONG).show();
 
                 if (uri != null) {
@@ -133,19 +150,7 @@ public class NewSocialActivity extends AppCompatActivity {
                         }
                     });
                 }
-            }
-        });
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        //image from gallery result
-        if (requestCode == 2 && resultCode == RESULT_OK){
-            uri = data.getData();
-            // sets the imageview to this image
-            uploadImage.setImageURI(uri);
-
+                break;
         }
     }
 }
